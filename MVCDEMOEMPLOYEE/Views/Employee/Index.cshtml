@@ -1,0 +1,191 @@
+﻿@model IEnumerable<MVCDEMOEMPLOYEE.Models.EmployeeModel>
+
+<!-- Include Bootstrap -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.datatables.net/2.2.2/css/dataTables.dataTables.css" defer />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" defer>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/css/iziToast.css" integrity="sha512-DIW4FkYTOxjCqRt7oS9BFO+nVOwDL4bzukDyDtMO7crjUZhwpyrWBFroq+IqRe6VnJkTpRAS6nhDvf0w+wHmxg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" defer />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/css/bootstrap-multiselect.min.css">
+@*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" defer>*@
+
+
+<div class="container mt-4">
+    <h2 class="text-center">Employee Management</h2>
+
+    <!-- Employee Form -->
+    <form id="empForm" class="border p-4 bg-light rounded row">
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <input type="hidden" id="empId" name="empId" value="0" />
+                <label>EmpCode:<span class="text-danger">*</span></label>
+                <input type="text" class="form-control" name="EmpCode" id="empCode" />
+
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <label>EmpName:</label><span class="text-danger">*</span>
+                <input type="text" class="form-control" name="EmpName" id="empName" required />
+                <span id="EmpNameError" display="none" class="text-primary"></span>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <label>Department:</label><span class="text-danger">*</span>
+                <select id="ddlDepartmentss" name="tests" multiple="multiple" class="form-control"></select>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <label>Profile Picture:</label>
+                <input type="file" class="form-control" id="profilePic" name="Image" />
+
+            </div>
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <label>Designation:</label><span class="text-danger">*</span>
+                <select name="SelectedDesignation" id="ddlDesignation" class="form-control">
+                    <option value="0">Select Designation</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-12">
+            <div class="form-group">
+                <label>Gender:</label><span class="text-danger">*</span><br>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" id="male" name="gender" value="0"> Male
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" class="form-check-input" id="female" name="gender" value="1"> Female
+                </div>
+            </div>
+        </div>
+        <div class="col-12 text-center">
+            <button type="button" id="submit" class="btn btn-success">Submit</button>
+            <button type="button" id="reset" class="btn btn-secondary">Cancel</button>
+        </div>
+
+
+    </form>
+
+
+    <!-- Employee Data Grid -->
+    <div id="employeeGrid" class="container mt-4">
+        <div class="d-flex justify-content-between">
+            <h2>Employee Data</h2>
+            <button type="button" id="InAcitveEmp" data-bs-toggle="modal" data-bs-target="#inactiveEmpModal" class="btn btn-outline-primary btn-sm">Show InActive Employee</button>
+        </div>
+        <table class="table table-bordered table-hover" id="tblEmployee">
+            <thead class="thead-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Employee Code</th>
+                    <th>Name</th>
+                    <th>Gender</th>
+                    <th>Department</th>
+                    <th>Designation</th>
+                    <th>Action</th>
+
+                </tr>
+            </thead>
+            <tbody id="employeeTableBody">
+                <!-- Data will be populated dynamically -->
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="employeeModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="employeeModalLabel">Employee Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-4 displayImage">
+                        <img id="modalempImage" src="" alt="Employee Image" class="img-fluid" />
+                        <button type="button" id="btnDownload" onclick="downloadButton()" class="btn btn-outline-danger btn-sm mt-2"><i class="bi bi-download"></i></button>
+                    </div>
+                    <div class="col-8" id="DivPopulateData">
+                        <div class="col-lg-4 col-md-4">
+                            <p><strong>Employee Name: </strong><span id="modalempName"></span></p>
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                            <p><strong>Employee Code: </strong><span id="modalempCode"></span></p>
+                        </div>
+                        <div class="col-lg-4 col-md-4">
+                            <p><strong>Gender: </strong><span id="modalempGender"></span></p>
+                        </div>
+                        <div class="col-lg-6 col-md-6">
+                            <p><strong>Department: </strong><span id="modalempDept"></span></p>
+                        </div>
+
+                        <div class="col-lg-6 col-md-6">
+                            <p><strong>Designation: </strong><span id="modalempDesignation"></span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="inactiveEmpModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+
+                <h5 class="modal-title" id="employeeModalLabel">Employee Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="employeeInActiveGrid" class="mt-4" style="overflow-x:auto">
+                    <h2>Employee Data</h2>
+                    <table class="table table-bordered table-hover" id="tblInActiveEmployee">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Employee Code</th>
+                                <th>Name</th>
+                                <th>Gender</th>
+                                <th>Department</th>
+                                <th>Designation</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="employeeInActiveTableBody">
+                            <!-- Data will be populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Include Bootstrap and jQuery -->
+
+@section scripts{
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" defer></script>
+    <script src="https://cdn.datatables.net/2.2.2/js/dataTables.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/izitoast/1.4.0/js/iziToast.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/1.1.2/js/bootstrap-multiselect.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js" integrity="sha384-b/U6ypiBEHpOf/4+1nzFpr53nxSS+GLCkfwBdFNTxtclqqenISfwAzpKaMNFNmj4" crossorigin="anonymous"></script>
+    <script src="~/EmployeeScript/EmployeeScript.js" defer></script>
+
+
+
+}
+
